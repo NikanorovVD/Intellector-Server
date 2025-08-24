@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 
 
-namespace PlantWatch
+namespace MatchMaking
 {
     public static class IServiceCollectionExtensions
     {
@@ -44,7 +44,7 @@ namespace PlantWatch
                 });
             });
         }
-       
+
 
         public static void AddAppAuthentication(this IServiceCollection services, IConfiguration configuration)
         {

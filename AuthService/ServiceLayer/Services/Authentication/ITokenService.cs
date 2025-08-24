@@ -1,4 +1,4 @@
-﻿using AuthService.Models;
+﻿using ServiceLayer.Models;
 using Shared.Models;
 
 namespace ServiceLayer.Services.Authentication

@@ -1,9 +1,9 @@
-﻿using AuthService.Models;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using ServiceLayer.Configuration;
+using ServiceLayer.Models;
 using ServiceLayer.Services.Authentication;
 using Shared.Constants;
 using Shared.Models;

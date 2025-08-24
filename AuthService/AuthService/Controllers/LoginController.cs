@@ -1,6 +1,6 @@
-﻿using AuthService.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Models;
 using ServiceLayer.Services.Authentication;
 using Shared.Models;
 

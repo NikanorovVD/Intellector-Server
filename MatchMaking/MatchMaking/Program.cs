@@ -10,7 +10,7 @@ using ServiceLayer.Models;
 using ServiceLayer.Services;
 using Shared.Models;
 
-namespace PlantWatch
+namespace MatchMaking
 {
     public class Program
     {

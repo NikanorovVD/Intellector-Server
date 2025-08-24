@@ -1,4 +1,4 @@
-﻿namespace AuthService.Models
+﻿namespace ServiceLayer.Models
 {
     public class TokenDto
     {
