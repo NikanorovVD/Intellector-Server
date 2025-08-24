@@ -7,9 +7,9 @@ namespace ServiceLayer.Services
 {
     public class MatchingService
     {
-        private readonly KafkaProducerBackgroundService<GameInfo> _kafkaProducer;
+        private readonly KafkaProducerBackgroundService<CreateGameRequest> _kafkaProducer;
 
-        public MatchingService(KafkaProducerBackgroundService<GameInfo> kafkaProducer)
+        public MatchingService(KafkaProducerBackgroundService<CreateGameRequest> kafkaProducer)
         {
             _kafkaProducer = kafkaProducer;
         }
@@ -17,7 +17,7 @@ namespace ServiceLayer.Services
         public void CreateGame(LobbyDto lobby, string userJoiningId)
         {
             (string whiteId, string blackId) = AssignColors(lobby, userJoiningId);
-            GameInfo gameInfo = new GameInfo()
+            CreateGameRequest gameInfo = new CreateGameRequest()
             {
                 BlackPlayerId = blackId,
                 WhitePlayerId = whiteId,

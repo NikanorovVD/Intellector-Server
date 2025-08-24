@@ -1,11 +1,13 @@
-﻿namespace Shared.Models
+﻿using Shared.Models;
+
+namespace ServiceLayer.Models
 {
-    public class GameInfo
+    public class StartGameMessage
     {
-        public int GameId { get; set; }
+        public string GameId { get; set; }
         public string WhitePlayerId { get; set; }
         public string BlackPlayerId { get; set; }
         public TimeControlDto? TimeControl { get; set; }
-        public bool Rating {  get; set; }
+        public bool Rating { get; set; }
     }
 }

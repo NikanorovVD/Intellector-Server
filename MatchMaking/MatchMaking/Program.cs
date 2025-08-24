@@ -34,7 +34,7 @@ namespace PlantWatch
             builder.Services.AddHostedService<DatabaseInitService>();
 
             builder.Services.AddKafka(builder.Configuration.GetSection("Kafka"));
-            builder.Services.AddKafkaProducer<GameInfo>();
+            builder.Services.AddKafkaProducer<CreateGameRequest>();
 
             var app = builder.Build();
 
