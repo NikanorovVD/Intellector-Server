@@ -14,6 +14,7 @@ namespace ServiceLayer.Services
     {
         private readonly IHubContext<GameHub> _hubContext;
         private readonly GameRedisService _gameService;
+        private readonly BoardService _boardService;
         private readonly IMapper _mapper;
 
         public GameStartKafkaConsumerService(IServiceScopeFactory serviceScopeFactory, KafkaListenerService<CreateGameRequest> kafkaListenerService)
@@ -23,6 +24,7 @@ namespace ServiceLayer.Services
             _hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<GameHub>>();
             _mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
             _gameService = scope.ServiceProvider.GetRequiredService<GameRedisService>();
+            _boardService = scope.ServiceProvider.GetRequiredService<BoardService>();
         }
 
         protected override async Task ProcessMessageAsync(CreateGameRequest gameRequest)
@@ -30,7 +32,9 @@ namespace ServiceLayer.Services
             // создать игру в redis
             Game game = _mapper.Map<Game>(gameRequest);
             game.Turn = PlayerColor.White;
+
             string id = await _gameService.CreateAsync(game);
+            await _boardService.CreateBoardAsync(id);
 
             // отправить сообщения клиентам
             StartGameMessage gameInfo = _mapper.Map<StartGameMessage>(gameRequest);

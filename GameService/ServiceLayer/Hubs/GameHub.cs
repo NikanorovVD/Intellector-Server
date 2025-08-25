@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DataLayer;
+using IntellectorLogic;
 using KafkaMessaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -11,16 +12,18 @@ using System.Security.Claims;
 namespace ServiceLayer.Hubs
 {
     [Authorize]
-    public class GameHub: Hub
+    public class GameHub : Hub
     {
         private readonly KafkaProducerBackgroundService<MoveDto> _kafkaProducer;
         private readonly GameRedisService _gameService;
+        private readonly BoardService _boardService;
         private readonly IMapper _mapper;
 
-        public GameHub(KafkaProducerBackgroundService<MoveDto> kafkaProducer, GameRedisService gameService, IMapper mapper)
+        public GameHub(KafkaProducerBackgroundService<MoveDto> kafkaProducer, GameRedisService gameService, BoardService boardService, IMapper mapper)
         {
             _kafkaProducer = kafkaProducer;
             _gameService = gameService;
+            _boardService = boardService;
             _mapper = mapper;
         }
 
@@ -43,14 +46,14 @@ namespace ServiceLayer.Hubs
             if (userId != idWhite && userId != idBlack) throw new HubException("Access denied");
 
             // проверка очередности хода
-            if(game.Turn != playerColor) throw new HubException("Not your turn");
+            if (game.Turn != playerColor) throw new HubException("Not your turn");
 
             // проверка валидности хода
+            Board board = await _boardService.GetBoardAsync(gameId);
+            if (!board.CheckIfMoveIsAvailable(move)) throw new HubException("Illegal move");
 
-            // переключение очередности хода
-            await _gameService.SwitchTurnAsync(gameId);
-
-            // изменение позиций фигур в redis
+            // оправка хода клиентам
+            await Clients.All.SendAsync(GameHubMethods.ReceiveMove, move, playerColor);
 
             // отправка хода в Kafka
             MoveDto moveDto = new()
@@ -61,8 +64,19 @@ namespace ServiceLayer.Hubs
             };
             _kafkaProducer.EnqueueMessage(moveDto);
 
-            // оправка хода клиентам
-            await Clients.All.SendAsync(GameHubMethods.ReceiveMove, move, playerColor);
+            // проверка является ли ход победным
+            if (board.CheckIfMoveAreWinning(move))
+            {
+                // отправка результата игры в Kafka
+
+                // отправка результата игры клиентам 
+            }
+
+            // переключение очередности хода
+            await _gameService.SwitchTurnAsync(gameId);
+
+            // изменение позиций фигур
+            await _boardService.UpdateBoardWithMoveAsync(gameId, move);
         }
     }
 }

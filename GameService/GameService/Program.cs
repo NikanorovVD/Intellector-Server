@@ -19,7 +19,9 @@ namespace GameService
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddScoped(typeof(RedisJsonStorageService<>));
             builder.Services.AddScoped<GameRedisService>();
+            builder.Services.AddScoped<BoardService>();
             builder.Services.AddSignalR();
 
             builder.Services.AddOpenApi();

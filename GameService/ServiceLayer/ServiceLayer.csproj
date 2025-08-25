@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\IntellectorLogic\IntellectorLogic.csproj" />
 		<ProjectReference Include="..\..\KafkaMessaging\KafkaMessaging.csproj" />
 		<ProjectReference Include="..\DataLayer\DataLayer.csproj" />
 	</ItemGroup>
@@ -15,7 +16,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
-		<PackageReference Include="StackExchange.Redis" Version="2.9.11" />
 	</ItemGroup>
 
 </Project>
