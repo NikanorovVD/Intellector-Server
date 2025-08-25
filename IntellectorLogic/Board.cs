@@ -25,11 +25,23 @@ namespace IntellectorLogic
             return possibleMoves.Contains(move);
         }
 
-        public bool CheckIfMoveAreWinning(Move move)
+        public bool CheckIfMoveAreWinning(Move move, out GameResultReason? reason)
         {
             IPiece movingPiece = Pieces[move.StartX][move.StartY];
             IPiece target = Pieces[move.EndX][move.EndY];
-            return CaptureIntellector() || IntellectorReachLustRank();
+            if (CaptureIntellector())
+            {
+                reason = GameResultReason.IntellectorCapture;
+                return true;
+            }
+            if (IntellectorReachLustRank())
+            {
+                reason = GameResultReason.IntellectorReachLustRank;
+                return true;
+            }
+            reason = null;
+            return false;
+
 
             bool CaptureIntellector()
             {

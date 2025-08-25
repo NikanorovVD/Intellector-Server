@@ -4,6 +4,7 @@ using IntellectorLogic;
 using KafkaMessaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using ServiceLayer.Models;
 using ServiceLayer.Services;
 using Shared.Models;
 using System.Security.Claims;
@@ -65,11 +66,14 @@ namespace ServiceLayer.Hubs
             _kafkaProducer.EnqueueMessage(moveDto);
 
             // проверка является ли ход победным
-            if (board.CheckIfMoveAreWinning(move))
+            if (board.CheckIfMoveAreWinning(move, out GameResultReason? reason))
             {
                 // отправка результата игры в Kafka
 
                 // отправка результата игры клиентам 
+                GameResult gameResult = (userId == idWhite) ? GameResult.WhiteWins : GameResult.BlackWins;
+                GameResultMessage message = new(gameResult, reason.Value);
+                await Clients.Users(idBlack, idWhite).SendAsync(GameHubMethods.ReceiveGameResult, message);
             }
 
             // переключение очередности хода
