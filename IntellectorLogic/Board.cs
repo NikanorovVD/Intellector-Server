@@ -44,6 +44,24 @@ namespace IntellectorLogic
             }
         }
 
+        public void ExecuteMove(Move move)
+        {
+            if (move.Transformation == null)
+            {
+                Pieces[move.EndX][move.EndY] = Pieces[move.StartX][move.StartY];
+                Pieces[move.EndX][move.EndY].X = move.EndX;
+                Pieces[move.EndX][move.EndY].Y = move.EndY;
+                Pieces[move.EndX][move.EndY].Y = move.EndY;
+            }
+            else
+            {
+                IPiece movingPiece = Pieces[move.StartX][move.StartY];
+                Pieces[move.EndX][move.EndY] = CreatePiece(move.Transformation.Value, move.EndX, move.EndY, movingPiece.Team);
+            }
+
+            Pieces[move.StartX][move.StartY] = null;
+        }
+
         public static Board CreateWithStartPosition()
         {
             Board board = new Board();
@@ -76,6 +94,19 @@ namespace IntellectorLogic
                 board.Pieces[i][5] = new Progressor(i, 5, true, board.Pieces);
 
             return board;
+        }
+
+        private IPiece CreatePiece(PieceType type, int x, int y, bool team)
+        {
+            return type switch
+            {
+                PieceType.Dominator => new Dominator(x, y, team, Pieces),
+                PieceType.Liberator => new Liberator(x, y, team, Pieces),
+                PieceType.Agressor => new Agressor(x, y, team, Pieces),
+                PieceType.Progressor => new Progressor(x, y, team, Pieces),
+                PieceType.Defensor => new Defensor(x, y, team, Pieces),
+                PieceType.Intellector => new Intellector(x, y, team, Pieces)
+            };
         }
     }
 }
