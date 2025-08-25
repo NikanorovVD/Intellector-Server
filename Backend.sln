@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameService", "GameService\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{77C5A02D-C630-49C0-A799-8BD1A5E82D65}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntellectorLogic", "IntellectorLogic\IntellectorLogic.csproj", "{CEF3EAE1-27F6-4DED-8B3E-9B20A25A2DEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,10 @@ Global
 		{77C5A02D-C630-49C0-A799-8BD1A5E82D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77C5A02D-C630-49C0-A799-8BD1A5E82D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77C5A02D-C630-49C0-A799-8BD1A5E82D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEF3EAE1-27F6-4DED-8B3E-9B20A25A2DEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF3EAE1-27F6-4DED-8B3E-9B20A25A2DEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF3EAE1-27F6-4DED-8B3E-9B20A25A2DEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEF3EAE1-27F6-4DED-8B3E-9B20A25A2DEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
