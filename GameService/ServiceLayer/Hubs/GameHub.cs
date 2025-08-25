@@ -53,7 +53,7 @@ namespace ServiceLayer.Hubs
             if (!board.CheckIfMoveIsAvailable(move)) throw new HubException("Illegal move");
 
             // оправка хода клиентам
-            await Clients.All.SendAsync(GameHubMethods.ReceiveMove, move, playerColor);
+            await Clients.Users(idBlack, idWhite).SendAsync(GameHubMethods.ReceiveMove, move, playerColor);
 
             // отправка хода в Kafka
             MoveDto moveDto = new()
