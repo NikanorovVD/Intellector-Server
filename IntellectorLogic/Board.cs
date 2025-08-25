@@ -1,11 +1,12 @@
 ﻿using IntellectorLogic.Pieces;
 using Shared.Models;
+using System.Runtime.Serialization;
 
 namespace IntellectorLogic
 {
     public class Board
     {
-        public IPiece[][] Pieces;
+        public IPiece[][] Pieces { get; set; }
 
         public IEnumerable<Move> GetAllAvailableMoves()
         {
@@ -17,7 +18,10 @@ namespace IntellectorLogic
 
         public bool CheckIfMoveIsAvailable(Move move)
         {
-            IEnumerable<Move> possibleMoves = Pieces[move.StartX][move.StartY].GetAvailableMoves();
+            var movingPiece = Pieces[move.StartX][move.StartY];
+            if (movingPiece == null) return false;
+
+            IEnumerable<Move> possibleMoves = movingPiece.GetAvailableMoves();
             return possibleMoves.Contains(move);
         }
 
@@ -107,6 +111,19 @@ namespace IntellectorLogic
                 PieceType.Defensor => new Defensor(x, y, team, Pieces),
                 PieceType.Intellector => new Intellector(x, y, team, Pieces)
             };
+        }
+
+        [OnDeserialized]
+        internal void OnDeserialized(StreamingContext context)
+        {
+            foreach (var row in Pieces)
+            {
+                foreach (var piece in row)
+                {
+                    if (piece != null)
+                        piece.Board = Pieces;
+                }
+            }
         }
     }
 }
