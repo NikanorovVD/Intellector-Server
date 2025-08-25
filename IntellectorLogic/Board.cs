@@ -16,10 +16,11 @@ namespace IntellectorLogic
             ));
         }
 
-        public bool CheckIfMoveIsAvailable(Move move)
+        public bool CheckIfMoveIsAvailable(Move move, PlayerColor playerColor)
         {
             var movingPiece = Pieces[move.StartX][move.StartY];
             if (movingPiece == null) return false;
+            if (movingPiece.Team != ((int)playerColor == 1)) return false;
 
             IEnumerable<Move> possibleMoves = movingPiece.GetAvailableMoves();
             return possibleMoves.Contains(move);

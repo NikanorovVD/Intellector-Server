@@ -51,7 +51,7 @@ namespace ServiceLayer.Hubs
 
             // проверка валидности хода
             Board board = await _boardService.GetBoardAsync(gameId);
-            if (!board.CheckIfMoveIsAvailable(move)) throw new HubException("Illegal move");
+            if (!board.CheckIfMoveIsAvailable(move, playerColor)) throw new HubException("Illegal move");
 
             // оправка хода клиентам
             await Clients.Users(idBlack, idWhite).SendAsync(GameHubMethods.ReceiveMove, move, playerColor);
