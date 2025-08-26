@@ -18,14 +18,12 @@ namespace ServiceLayer.Hubs
         private readonly KafkaProducerBackgroundService<MoveDto> _kafkaProducer;
         private readonly GameRedisService _gameService;
         private readonly BoardService _boardService;
-        private readonly IMapper _mapper;
 
-        public GameHub(KafkaProducerBackgroundService<MoveDto> kafkaProducer, GameRedisService gameService, BoardService boardService, IMapper mapper)
+        public GameHub(KafkaProducerBackgroundService<MoveDto> kafkaProducer, GameRedisService gameService, BoardService boardService)
         {
             _kafkaProducer = kafkaProducer;
             _gameService = gameService;
             _boardService = boardService;
-            _mapper = mapper;
         }
 
         public async Task SendMove(string gameId, Move move)
@@ -60,6 +58,7 @@ namespace ServiceLayer.Hubs
             MoveDto moveDto = new()
             {
                 Move = move,
+                Number = game.MoveCount,
                 UserId = userId,
                 MadeAt = DateTime.UtcNow
             };
@@ -76,8 +75,8 @@ namespace ServiceLayer.Hubs
                 await Clients.Users(idBlack, idWhite).SendAsync(GameHubMethods.ReceiveGameResult, message);
             }
 
-            // переключение очередности хода
-            await _gameService.SwitchTurnAsync(gameId);
+            // переключение очередности хода и увеличение счетчика ходов
+            await _gameService.UpdateGameWithMove(gameId);
 
             // изменение позиций фигур
             await _boardService.UpdateBoardWithMoveAsync(gameId, move);

@@ -25,12 +25,15 @@ namespace ServiceLayer.Services
             return await _redisService.ReadAsync(id);
         }
 
-        public async Task SwitchTurnAsync(string id)
+        public async Task UpdateGameWithMove(string id)
         {            
             Game game = await _redisService.ReadAsync(id);
+
             game.Turn = game.Turn == PlayerColor.White ?
                 PlayerColor.Black :
                 PlayerColor.White;
+
+            game.MoveCount++;
 
             await _redisService.WriteAsync(id,  game);
         }
