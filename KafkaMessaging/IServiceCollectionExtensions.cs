@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
 
 namespace KafkaMessaging
 {
@@ -9,17 +11,31 @@ namespace KafkaMessaging
         {
             services.AddSingleton(typeof(KafkaMessageService<>), typeof(KafkaMessageService<>));
             services.AddSingleton(typeof(KafkaListenerService<>), typeof(KafkaListenerService<>));
-            services.Configure<KafkaSettings>(configurationSection);
         }
 
-        public static void AddKafkaConsumer<TConsumer, TMessage>(this IServiceCollection services) where TConsumer: KafkaConsumerBackgroundService<TMessage>
+        public static void AddKafkaConsumer<TConsumer, TMessage>(
+            this IServiceCollection services,
+            IConfigurationSection configurationSection)
+            where TConsumer : KafkaConsumerBackgroundService<TMessage>
         {
-            services.AddHostedService<TConsumer>();
+            KafkaConsumerConfig settings = configurationSection.Get<KafkaConsumerConfig>();
+            services.AddHostedService((serviceProvider) =>
+            {
+                var logger = serviceProvider.GetRequiredService<ILogger<KafkaListenerService<TMessage>>>();
+                var listenerService = new KafkaListenerService<TMessage>(settings, logger);
+
+                return ActivatorUtilities.CreateInstance<TConsumer>(serviceProvider, listenerService);
+            });
         }
 
-        public static void AddKafkaProducer<TMessage>(this IServiceCollection services)
+        public static void AddKafkaProducer<TMessage>(this IServiceCollection services, IConfigurationSection configurationSection)
         {
-            services.AddSingleton<KafkaProducerBackgroundService<TMessage>>();
+            KafkaProducerConfig settings = configurationSection.Get<KafkaProducerConfig>();
+            services.AddSingleton((serviceProvider) =>
+            {
+                var messageService = new KafkaMessageService<TMessage>(settings);
+                return ActivatorUtilities.CreateInstance<KafkaProducerBackgroundService<TMessage>>(serviceProvider);
+            });
             services.AddHostedService<KafkaProducerBackgroundService<TMessage>>(provider => provider.GetService<KafkaProducerBackgroundService<TMessage>>()!);
         }
     }

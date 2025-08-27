@@ -1,5 +1,4 @@
 ﻿using Confluent.Kafka;
-using Microsoft.Extensions.Options;
 
 namespace KafkaMessaging
 {
@@ -8,18 +7,18 @@ namespace KafkaMessaging
         private readonly IProducer<string, TMessage> _producer;
         private readonly string _topic;
 
-        public KafkaMessageService(IOptions<KafkaSettings> kafkaSettings)
+        public KafkaMessageService(KafkaProducerConfig options)
         {
             var config = new ProducerConfig()
             {
-                BootstrapServers = kafkaSettings.Value.Producer.BootstrapServers
+                BootstrapServers = options.BootstrapServers
             };
 
             _producer = new ProducerBuilder<string, TMessage>(config)
                 .SetValueSerializer(new KafkaJsonSerializer<TMessage>())
                 .Build();
 
-            _topic = kafkaSettings.Value.Producer.Topic;
+            _topic = options.Topic;
         }
 
         public async Task SendMessageAsync(TMessage message)

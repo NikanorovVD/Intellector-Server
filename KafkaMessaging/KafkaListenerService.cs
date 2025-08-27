@@ -1,6 +1,5 @@
 ﻿using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace KafkaMessaging
 {
@@ -11,16 +10,16 @@ namespace KafkaMessaging
         private readonly ILogger<KafkaListenerService<TMessage>> _logger;
         public event Func<TMessage, Task> OnMessageAsync;
 
-        public KafkaListenerService(IOptions<KafkaSettings> options, ILogger<KafkaListenerService<TMessage>> logger)
+        public KafkaListenerService(KafkaConsumerConfig options, ILogger<KafkaListenerService<TMessage>> logger)
         {
             var config = new ConsumerConfig
             {
-                BootstrapServers = options.Value.Consumer.BootstrapServers,
-                GroupId = options.Value.Consumer.GroupId,
+                BootstrapServers = options.BootstrapServers,
+                GroupId = options.GroupId,
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
-            _topic = options.Value.Consumer.Topic;
+            _topic = options.Topic;
             _consumer = new ConsumerBuilder<Null, TMessage>(config)
                 .SetValueDeserializer(new KafkaJsonDeserializer<TMessage>())
                 .Build();
