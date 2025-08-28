@@ -16,6 +16,7 @@ namespace ServiceLayer.Services
         private readonly GameRedisService _gameService;
         private readonly BoardService _boardService;
         private readonly IMapper _mapper;
+        private readonly KafkaProducerBackgroundService<StartGameMessage> _startKafkaProducer;
 
         public GameStartKafkaConsumerService(IServiceScopeFactory serviceScopeFactory, KafkaListenerService<CreateGameRequest> kafkaListenerService)
             : base(kafkaListenerService)
@@ -25,22 +26,25 @@ namespace ServiceLayer.Services
             _mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
             _gameService = scope.ServiceProvider.GetRequiredService<GameRedisService>();
             _boardService = scope.ServiceProvider.GetRequiredService<BoardService>();
+            _startKafkaProducer = scope.ServiceProvider.GetRequiredService<KafkaProducerBackgroundService<StartGameMessage>>();
         }
 
         protected override async Task ProcessMessageAsync(CreateGameRequest gameRequest)
         {
-            // создать игру в redis
+            // создание игры в redis
             Game game = _mapper.Map<Game>(gameRequest);
             game.Turn = PlayerColor.White;
 
             string id = await _gameService.CreateAsync(game);
             await _boardService.CreateBoardAsync(id);
 
-            // отправить сообщения клиентам
-            StartGameMessage gameInfo = _mapper.Map<StartGameMessage>(gameRequest);
-            gameInfo.GameId = id;
+            // отправка сообщения в Kafka
+            StartGameMessage startGameMessage = _mapper.Map<StartGameMessage>(gameRequest);
+            startGameMessage.GameId = id;
+            _startKafkaProducer.EnqueueMessage(startGameMessage);
 
-            await _hubContext.Clients.Users(gameRequest.WhitePlayerId, gameRequest.BlackPlayerId).SendAsync(GameHubMethods.ReceiveStartGame, gameInfo);
+            // отправка сообщения клиентам
+            await _hubContext.Clients.Users(gameRequest.WhitePlayerId, gameRequest.BlackPlayerId).SendAsync(GameHubMethods.ReceiveStartGame, startGameMessage);
         }
     }
 }

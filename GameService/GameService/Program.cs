@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using ServiceLayer.Configuration;
 using ServiceLayer.Hubs;
+using ServiceLayer.Models;
 using ServiceLayer.Services;
 using Shared.Models;
 using StackExchange.Redis;
@@ -39,9 +40,11 @@ namespace GameService
             });
 
             // Kafka
-            builder.Services.AddKafka(builder.Configuration.GetSection("Kafka"));
-            builder.Services.AddKafkaProducer<MoveDto>();
-            builder.Services.AddKafkaConsumer<GameStartKafkaConsumerService, CreateGameRequest>();
+            builder.Services.AddKafkaProducer<MoveDto>(builder.Configuration.GetSection("Kafka:Producers:Move"));
+            builder.Services.AddKafkaProducer<StartGameMessage>(builder.Configuration.GetSection("Kafka:Producers:StartGame"));
+            builder.Services.AddKafkaProducer<GameResultDto>(builder.Configuration.GetSection("Kafka:Producers:ResultGame"));
+
+            builder.Services.AddKafkaConsumer<GameStartKafkaConsumerService, CreateGameRequest>(builder.Configuration.GetSection("Kafka:Consumers:CreateGame"));
 
 
             var app = builder.Build();

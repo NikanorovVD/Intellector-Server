@@ -4,7 +4,6 @@ using IntellectorLogic;
 using KafkaMessaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using ServiceLayer.Models;
 using ServiceLayer.Services;
 using Shared.Models;
 using System.Security.Claims;
@@ -15,13 +14,15 @@ namespace ServiceLayer.Hubs
     [Authorize]
     public class GameHub : Hub
     {
-        private readonly KafkaProducerBackgroundService<MoveDto> _kafkaProducer;
+        private readonly KafkaProducerBackgroundService<MoveDto> _kafkaMoveProducer;
+        private readonly KafkaProducerBackgroundService<GameResultDto> _kafkaResultProducer;
         private readonly GameRedisService _gameService;
         private readonly BoardService _boardService;
 
-        public GameHub(KafkaProducerBackgroundService<MoveDto> kafkaProducer, GameRedisService gameService, BoardService boardService)
+        public GameHub(KafkaProducerBackgroundService<MoveDto> kafkaMoveProducer, KafkaProducerBackgroundService<GameResultDto> kafkaResultProducer, GameRedisService gameService, BoardService boardService)
         {
-            _kafkaProducer = kafkaProducer;
+            _kafkaMoveProducer = kafkaMoveProducer;
+            _kafkaResultProducer = kafkaResultProducer;
             _gameService = gameService;
             _boardService = boardService;
         }
@@ -62,17 +63,19 @@ namespace ServiceLayer.Hubs
                 UserId = userId,
                 MadeAt = DateTime.UtcNow
             };
-            _kafkaProducer.EnqueueMessage(moveDto);
+            _kafkaMoveProducer.EnqueueMessage(moveDto);
 
             // проверка является ли ход победным
             if (board.CheckIfMoveAreWinning(move, out GameResultReason? reason))
             {
+                GameResult gameResult = (userId == idWhite) ? GameResult.WhiteWins : GameResult.BlackWins;
+                GameResultDto resultMessage = new(gameResult, reason.Value);
+
                 // отправка результата игры в Kafka
+                _kafkaResultProducer.EnqueueMessage(resultMessage);
 
                 // отправка результата игры клиентам 
-                GameResult gameResult = (userId == idWhite) ? GameResult.WhiteWins : GameResult.BlackWins;
-                GameResultMessage message = new(gameResult, reason.Value);
-                await Clients.Users(idBlack, idWhite).SendAsync(GameHubMethods.ReceiveGameResult, message);
+                await Clients.Users(idBlack, idWhite).SendAsync(GameHubMethods.ReceiveGameResult, resultMessage);
             }
 
             // переключение очередности хода и увеличение счетчика ходов
