@@ -33,8 +33,7 @@ namespace MatchMaking
             builder.Services.AddGenericCrud<AppDbContext>();
             builder.Services.AddHostedService<DatabaseInitService>();
 
-            builder.Services.AddKafka(builder.Configuration.GetSection("Kafka"));
-            builder.Services.AddKafkaProducer<CreateGameRequest>();
+            builder.Services.AddKafkaProducer<CreateGameRequest>(builder.Configuration.GetSection("Kafka:Producer"));
 
             var app = builder.Build();
 
