@@ -70,7 +70,7 @@ namespace ServiceLayer.Hubs
             if (board.CheckIfMoveAreWinning(move, out GameResultReason? reason))
             {
                 GameResult gameResult = (userId == idWhite) ? GameResult.WhiteWins : GameResult.BlackWins;
-                GameResultDto resultMessage = new(gameResult, reason.Value);
+                GameResultDto resultMessage = new(gameId, gameResult, reason.Value);
 
                 // отправка результата игры в Kafka
                 _kafkaResultProducer.EnqueueMessage(resultMessage);
