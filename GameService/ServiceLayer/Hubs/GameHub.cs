@@ -59,6 +59,7 @@ namespace ServiceLayer.Hubs
             MoveDto moveDto = new()
             {
                 Move = move,
+                GameId = gameId,
                 Number = game.MoveCount,
                 UserId = userId,
                 MadeAt = DateTime.UtcNow
