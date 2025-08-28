@@ -7,12 +7,6 @@ namespace KafkaMessaging
 {
     public static class IServiceCollectionExtensions
     {
-        public static void AddKafka(this IServiceCollection services, IConfigurationSection configurationSection)
-        {
-            services.AddSingleton(typeof(KafkaMessageService<>), typeof(KafkaMessageService<>));
-            services.AddSingleton(typeof(KafkaListenerService<>), typeof(KafkaListenerService<>));
-        }
-
         public static void AddKafkaConsumer<TConsumer, TMessage>(
             this IServiceCollection services,
             IConfigurationSection configurationSection)
@@ -34,8 +28,9 @@ namespace KafkaMessaging
             services.AddSingleton((serviceProvider) =>
             {
                 var messageService = new KafkaMessageService<TMessage>(settings);
-                return ActivatorUtilities.CreateInstance<KafkaProducerBackgroundService<TMessage>>(serviceProvider);
+                return ActivatorUtilities.CreateInstance<KafkaProducerBackgroundService<TMessage>>(serviceProvider, messageService);
             });
+
             services.AddHostedService<KafkaProducerBackgroundService<TMessage>>(provider => provider.GetService<KafkaProducerBackgroundService<TMessage>>()!);
         }
     }

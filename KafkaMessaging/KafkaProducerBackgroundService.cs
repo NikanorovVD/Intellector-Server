@@ -12,10 +12,9 @@ namespace KafkaMessaging
         private readonly SemaphoreSlim _semaphore = new(0);
         private readonly ILogger<KafkaProducerBackgroundService<TMessage>> _logger;
 
-        public KafkaProducerBackgroundService(IServiceScopeFactory serviceScopeFactory, ILogger<KafkaProducerBackgroundService<TMessage>> logger)
+        public KafkaProducerBackgroundService(KafkaMessageService<TMessage> kafkaProducer, ILogger<KafkaProducerBackgroundService<TMessage>> logger)
         {
-            var scope = serviceScopeFactory.CreateScope();
-            _kafkaProducer = scope.ServiceProvider.GetService<KafkaMessageService<TMessage>>();
+            _kafkaProducer = kafkaProducer;
             _logger = logger;
         }
 
