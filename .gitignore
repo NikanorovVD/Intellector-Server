@@ -39,3 +39,13 @@
 
 # debug information files
 *.dwo
+
+# Logs
+*.log
+
+# Application settings
+/settings.ini
+
+# VS Code
+/.vscode
+/.clang-format

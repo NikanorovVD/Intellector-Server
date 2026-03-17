@@ -1,4 +1,4 @@
-#include "game_logic.h"
+#include "intellector_logic.h"
 
 using namespace std;
 

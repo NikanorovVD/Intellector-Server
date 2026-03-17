@@ -1,4 +1,4 @@
-#include "game_logic.h"
+#include "intellector_logic.h"
 
 PiecePosition::PiecePosition() : piece(Piece()), x(0), y(0) {}
 
