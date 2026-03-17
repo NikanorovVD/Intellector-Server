@@ -97,7 +97,7 @@ int main() {
         settings = loadSettingsFromFile(settingsFilename);
 
         boost::asio::ip::tcp::acceptor acceptor(io_context,
-                                                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 8080));
+                                                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), settings.port));
 
         LogWriter::writeLine("Server Start");
 

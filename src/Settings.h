@@ -7,6 +7,7 @@ class Settings {
 public:
     std::string password;
     int version;
+    int port = 8080;
     Settings() = default;
 };
 
