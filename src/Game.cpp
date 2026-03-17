@@ -32,8 +32,8 @@ void Game::sendTeams() {
 
 void Game::start() {
     auto self = shared_from_this();
-    whiteThread_ = std::thread(&Game::manageGame, this, whiteSocket_, blackSocket_, false, timeController_);
-    blackThread_ = std::thread(&Game::manageGame, this, blackSocket_, whiteSocket_, true, timeController_);
+    whiteThread_ = std::thread(&Game::manageGame, this, whiteSocket_, blackSocket_, WhiteTeam, timeController_);
+    blackThread_ = std::thread(&Game::manageGame, this, blackSocket_, whiteSocket_, BlackTeam, timeController_);
     if (timeController_) {
         timeController_->start();
     }
@@ -41,7 +41,7 @@ void Game::start() {
 
 void Game::manageGame(std::shared_ptr<boost::asio::ip::tcp::socket> playerSocket,
                       std::shared_ptr<boost::asio::ip::tcp::socket> opponentSocket,
-                      bool isBlack,
+                      bool team,
                       std::shared_ptr<TimeController> timeController) {
     while (gameActive_) {
         uint8_t code = Protocol::recvCode(*playerSocket);
@@ -52,7 +52,7 @@ void Game::manageGame(std::shared_ptr<boost::asio::ip::tcp::socket> playerSocket
             Move move = Protocol::recvMove(*playerSocket);
 
             if (timeController) {
-                if (isBlack)
+                if (team == BlackTeam)
                     timeController->blackMakeMove();
                 else
                     timeController->whiteMakeMove();
@@ -61,7 +61,7 @@ void Game::manageGame(std::shared_ptr<boost::asio::ip::tcp::socket> playerSocket
             Protocol::sendMove(move, *opponentSocket);
 
             if (timeController) {
-                int time = isBlack ? timeController->getBlackTime() : timeController->getWhiteTime();
+                int time = team ? timeController->getBlackTime() : timeController->getWhiteTime();
                 Protocol::sendTime(time, *playerSocket);
                 Protocol::sendTime(time, *opponentSocket);
             }
@@ -69,7 +69,7 @@ void Game::manageGame(std::shared_ptr<boost::asio::ip::tcp::socket> playerSocket
         }
         case REMATCH_CODE: {
             Protocol::sendCode(REMATCH_CODE, *opponentSocket);
-            isBlack = !isBlack;
+            team = !team;
             if (timeController)
                 timeController->start();
             break;
@@ -89,7 +89,7 @@ void Game::manageGame(std::shared_ptr<boost::asio::ip::tcp::socket> playerSocket
 }
 
 void Game::sendTimeOut(bool team) {
-    uint8_t code = team ? BLACK_TIME_OUT_CODE : WHITE_TIME_OUT_CODE;
+    uint8_t code = (team == BlackTeam) ? BLACK_TIME_OUT_CODE : WHITE_TIME_OUT_CODE;
     Protocol::sendCode(code, *whiteSocket_);
     Protocol::sendCode(code, *blackSocket_);
     gameActive_ = false;

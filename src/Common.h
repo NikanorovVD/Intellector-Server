@@ -10,6 +10,9 @@
 #include <chrono>
 #include <boost/asio.hpp>
 
+constexpr bool WhiteTeam = false;
+constexpr bool BlackTeam = true;
+
 // Protocol constants
 // Game
 const uint8_t MOVE_CODE = 10;

@@ -7,7 +7,7 @@ using namespace std::chrono;
 
 TimeController::TimeController(const TimeControl& tc)
     : maxTime_(tc.maxMinutes * 60 * 1000), addedTime_(tc.addedSeconds * 1000), whiteTime_(0), blackTime_(0),
-      turn_(false), timeRunning_(false), gameAlive_(true) {}
+      turn_(WhiteTeam), timeRunning_(false), gameAlive_(true) {}
 
 TimeController::~TimeController() {
     stop();
@@ -17,7 +17,7 @@ void TimeController::start() {
     whiteTime_ = maxTime_;
     blackTime_ = maxTime_;
     lastMoveTime_ = steady_clock::now();
-    turn_ = false;
+    turn_ = WhiteTeam;
     timeRunning_ = true;
     if (checkerThread_.joinable())
         checkerThread_.join();
@@ -35,7 +35,7 @@ void TimeController::whiteMakeMove() {
     int elapsed = duration_cast<milliseconds>(now - lastMoveTime_).count();
     lastMoveTime_ = now;
     subtractWhiteTime(elapsed);
-    turn_ = true;
+    turn_ = BlackTeam;
 }
 
 void TimeController::blackMakeMove() {
@@ -43,7 +43,7 @@ void TimeController::blackMakeMove() {
     int elapsed = duration_cast<milliseconds>(now - lastMoveTime_).count();
     lastMoveTime_ = now;
     subtractBlackTime(elapsed);
-    turn_ = false;
+    turn_ = WhiteTeam;
 }
 
 void TimeController::subtractWhiteTime(int elapsedMs) {
@@ -53,7 +53,7 @@ void TimeController::subtractWhiteTime(int elapsedMs) {
     } else {
         timeRunning_ = false;
         if (timeOutCallback_)
-            timeOutCallback_(false);
+            timeOutCallback_(WhiteTeam);
     }
 }
 
@@ -64,7 +64,7 @@ void TimeController::subtractBlackTime(int elapsedMs) {
     } else {
         timeRunning_ = false;
         if (timeOutCallback_)
-            timeOutCallback_(true);
+            timeOutCallback_(BlackTeam);
     }
 }
 
@@ -74,7 +74,7 @@ void TimeController::checkTimeLoop() {
         if (timeRunning_) {
             auto now = steady_clock::now();
             int elapsed = duration_cast<milliseconds>(now - lastMoveTime_).count();
-            if (turn_) { // ход чёрных
+            if (turn_ == BlackTeam) { 
                 if (elapsed >= blackTime_) {
                     timeRunning_ = false;
                     if (timeOutCallback_)

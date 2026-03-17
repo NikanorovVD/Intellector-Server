@@ -1,5 +1,3 @@
-#define ENABLE_NETWORK_LOGGING
-
 #include <iostream>
 #include <thread>
 #include <unordered_map>
@@ -12,6 +10,8 @@
 #include "Protocol.h"
 #include "WaitingGame.h"
 #include "Game.h"
+
+#define ENABLE_NETWORK_LOGGING
 
 const std::string settingsFilename = "settings.ini";
 

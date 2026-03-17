@@ -23,7 +23,7 @@ public:
 private:
     void manageGame(std::shared_ptr<boost::asio::ip::tcp::socket> playerSocket,
                     std::shared_ptr<boost::asio::ip::tcp::socket> opponentSocket,
-                    bool isBlack,
+                    bool team,
                     std::shared_ptr<TimeController> timeController);
     void sendTimeOut(bool team);
 

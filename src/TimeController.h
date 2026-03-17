@@ -36,7 +36,7 @@ private:
     int whiteTime_;
     int blackTime_;
     std::chrono::steady_clock::time_point lastMoveTime_;
-    std::atomic<bool> turn_; // false = white, true = black
+    std::atomic<bool> turn_;
     std::atomic<bool> timeRunning_;
     std::atomic<bool> gameAlive_;
 
@@ -44,4 +44,4 @@ private:
     TimeOutCallback timeOutCallback_;
 };
 
-#endif // TIMECONTROLLER_H
+#endif
