@@ -14,7 +14,8 @@ SOURCES = \
     $(SRC_DIR)/LogWriter.cpp \
     $(SRC_DIR)/Protocol.cpp \
     $(SRC_DIR)/TimeController.cpp \
-    $(SRC_DIR)/Game.cpp
+    $(SRC_DIR)/Game.cpp \
+    $(SRC_DIR)/Matchmaking.cpp
 
 HEADERS = \
     $(SRC_DIR)/Common.h \
@@ -24,7 +25,8 @@ HEADERS = \
     $(SRC_DIR)/LogWriter.h \
     $(SRC_DIR)/Protocol.h \
     $(SRC_DIR)/TimeController.h \
-    $(SRC_DIR)/Game.h
+    $(SRC_DIR)/Game.h \
+    $(SRC_DIR)/Matchmaking.h
 
 OBJECTS = $(addprefix $(BUILD_DIR)/, $(notdir $(SOURCES:.cpp=.o)))
 
